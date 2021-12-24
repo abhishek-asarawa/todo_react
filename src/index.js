@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createBrowserHistory } from 'history';
 import { BrowserRouter } from 'react-router-dom';
+import SnackBarProvider from 'react-simple-snackbar';
 
 import './index.css';
 import App from './App';
@@ -15,7 +16,9 @@ const browserHistory = createBrowserHistory();
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <App browserHistory={browserHistory} />
+      <SnackBarProvider>
+        <App browserHistory={browserHistory} />
+      </SnackBarProvider>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root')
