@@ -1,6 +1,7 @@
 import React from 'react';
 import map from 'lodash/map';
 import { Table } from 'semantic-ui-react';
+import timeConvertor from '../helpers/timeConvertor';
 
 const getNestedValue = (obj, path) => {
   const [first, ...rest] = path.split('.');
@@ -45,7 +46,9 @@ const BoardTable = ({ columns, rows }) => {
                     key={`${col_index}_${index}`}
                     textAlign={cell.textAlign ? cell.textAlign : 'left'}
                   >
-                    {getNestedValue(row, cell.id)}
+                    {cell.type === 'timestamp'
+                      ? timeConvertor(getNestedValue(row, cell.id))
+                      : getNestedValue(row, cell.id)}
                   </Table.Cell>
                 );
               })}

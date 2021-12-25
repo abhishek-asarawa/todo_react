@@ -4,20 +4,35 @@ import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBoards } from '../../redux/actions/board';
 import { openSnack } from '../../redux/actions/snack';
-import BoardTable from './components/Table';
+import BoardTable from '../../components/Table';
 import Toolbar from './components/Toolbar';
 
 const endpoint = `${process.env.REACT_APP_URL}/boards?task-aggregates=required`;
 
 const columns = [
   [
-    { id: 'title', textAlign: 'left', name: 'Board Name' },
-    { id: 'createdAt', textAlign: 'left', name: 'Created On' }
+    { id: 'title', type: 'string', textAlign: 'left', name: 'Board Name' },
+    {
+      id: 'createdAt',
+      type: 'timestamp',
+      textAlign: 'left',
+      name: 'Created On'
+    }
   ],
   [
-    { id: 'tasks.completed', textAlign: 'center', name: 'Completed' },
-    { id: 'tasks.pending', textAlign: 'center', name: 'Pending' },
-    { id: 'tasks.total', textAlign: 'center', name: 'Total' }
+    {
+      id: 'tasks.completed',
+      type: 'number',
+      textAlign: 'center',
+      name: 'Completed'
+    },
+    {
+      id: 'tasks.pending',
+      type: 'number',
+      textAlign: 'center',
+      name: 'Pending'
+    },
+    { id: 'tasks.total', type: 'number', textAlign: 'center', name: 'Total' }
   ]
 ];
 
