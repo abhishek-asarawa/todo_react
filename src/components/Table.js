@@ -42,6 +42,7 @@ const BoardTable = ({ columns, rows, rowWithClickEvent, handleClick }) => {
             <Table.Row
               key={`row_${index}`}
               onClick={rowWithClickEvent ? () => handleClick(row.id) : () => {}}
+              style={rowWithClickEvent ? { cursor: 'pointer' } : {}}
             >
               {map([...columns[0], ...columns[1]], (cell, col_index) => {
                 return (
