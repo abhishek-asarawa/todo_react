@@ -10,7 +10,7 @@ const getNestedValue = (obj, path) => {
   return getNestedValue(data, rest.join('.'));
 };
 
-const BoardTable = ({ columns, rows }) => {
+const BoardTable = ({ columns, rows, rowWithClickEvent, handleClick }) => {
   return (
     <Table celled structured striped selectable>
       <Table.Header>
@@ -39,7 +39,10 @@ const BoardTable = ({ columns, rows }) => {
       <Table.Body>
         {map(rows, (row, index) => {
           return (
-            <Table.Row key={`row_${index}`}>
+            <Table.Row
+              key={`row_${index}`}
+              onClick={rowWithClickEvent ? () => handleClick(row.id) : () => {}}
+            >
               {map([...columns[0], ...columns[1]], (cell, col_index) => {
                 return (
                   <Table.Cell
