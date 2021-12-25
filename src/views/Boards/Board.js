@@ -21,18 +21,18 @@ const columns = [
   ],
   [
     {
-      id: 'tasks.completed',
+      id: 'tasksAgg.completed',
       type: 'number',
       textAlign: 'center',
       name: 'Completed'
     },
     {
-      id: 'tasks.pending',
+      id: 'tasksAgg.pending',
       type: 'number',
       textAlign: 'center',
       name: 'Pending'
     },
-    { id: 'tasks.total', type: 'number', textAlign: 'center', name: 'Total' }
+    { id: 'tasksAgg.total', type: 'number', textAlign: 'center', name: 'Total' }
   ]
 ];
 

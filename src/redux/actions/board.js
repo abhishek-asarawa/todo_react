@@ -4,3 +4,7 @@ export const setBoards = (boards) => {
     payload: [...boards]
   };
 };
+
+export const addBoard = (board) => {
+  return { type: 'ADD_BOARD', payload: { ...board } };
+};
