@@ -1,21 +1,40 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import { findIndex, has, isEmpty } from 'lodash';
+import { findIndex, has, isEmpty, map, reduce } from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { openSnack } from '../../redux/actions/snack';
 import { setTasks } from '../../redux/actions/task';
 import Toolbar from './components/Toolbar';
+import {
+  Card,
+  Divider,
+  Grid,
+  Header,
+  Image,
+  List,
+  Segment
+} from 'semantic-ui-react';
 
 const endpoint = `${process.env.REACT_APP_URL}/board`;
+
+const sections = [
+  { title: 'Pending Tasks', id: 'pending' },
+  { title: 'Completed Tasks', id: 'completed' }
+];
 
 const Board = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const boards = useSelector((state) => state.boardsReducer);
+  const tasks = useSelector((state) => state.tasksReducer);
 
   const [selectedBoard, setSelectedBoard] = useState({});
   const [notFound, setNotFound] = useState(false);
+  const [separatedTasks, setSeparatedTasks] = useState({
+    completed: [],
+    pending: []
+  });
 
   const selectedId = params.id;
 
@@ -51,6 +70,19 @@ const Board = () => {
     fetchBoardTasks();
   }, [fetchBoardTasks]);
 
+  useEffect(() => {
+    const { completed, pending } = reduce(
+      tasks,
+      (prev, task) => {
+        if (task.isComplete)
+          return { ...prev, completed: [...prev.completed, { ...task }] };
+        return { ...prev, pending: [...prev.pending, { ...task }] };
+      },
+      { completed: [], pending: [] }
+    );
+    setSeparatedTasks({ completed, pending });
+  }, [tasks]);
+
   if (notFound && !isEmpty(boards))
     return (
       <div>
@@ -61,7 +93,37 @@ const Board = () => {
   return (
     <div>
       <Toolbar board={selectedBoard} />
-      <h1>{`Board ${selectedId}`}</h1>
+      <Segment padded style={{ minHeight: '650px' }}>
+        <Grid columns={2} relaxed="very">
+          {sections.map((section) => (
+            <Grid.Column key={section.id}>
+              <Header as="h3" textAlign="center">
+                {section.title}
+              </Header>
+              <List animated verticalAlign="middle">
+                {map(separatedTasks[section.id], (task) => {
+                  return (
+                    <List.Item key={task.id}>
+                      <List.Content>
+                        <Card style={{ minWidth: '90%' }}>
+                          <Card.Content>
+                            <Card.Header>{task.title}</Card.Header>
+                            {/* <Card.Meta>Friends of Elliot</Card.Meta> */}
+                            <Card.Description>
+                              {task.description}
+                            </Card.Description>
+                          </Card.Content>
+                        </Card>
+                      </List.Content>
+                    </List.Item>
+                  );
+                })}
+              </List>
+            </Grid.Column>
+          ))}
+        </Grid>
+        <Divider vertical fitted />
+      </Segment>
     </div>
   );
 };
