@@ -6,15 +6,7 @@ import { useParams } from 'react-router-dom';
 import { openSnack } from '../../redux/actions/snack';
 import { setTasks } from '../../redux/actions/task';
 import Toolbar from './components/Toolbar';
-import {
-  Card,
-  Divider,
-  Grid,
-  Header,
-  Image,
-  List,
-  Segment
-} from 'semantic-ui-react';
+import { Card, Divider, Grid, Header, List, Segment } from 'semantic-ui-react';
 
 const endpoint = `${process.env.REACT_APP_URL}/board`;
 
