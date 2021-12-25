@@ -56,7 +56,7 @@ const Toolbar = ({ board }) => {
       }
     } catch (err) {
       console.error(err);
-      dispatch(openSnack('Facing error in creating board'));
+      dispatch(openSnack('Facing error in creating task'));
     }
     handleClose();
   };
@@ -78,6 +78,16 @@ const Toolbar = ({ board }) => {
     if (haveError) setSubmitDisable(true);
     else setSubmitDisable(false);
   }, [formData, formError]);
+
+  useEffect(() => {
+    if (!open) {
+      setFormData({ title: '', description: '' });
+      setFormError({
+        title: false,
+        description: false
+      });
+    }
+  }, [open]);
 
   return (
     <Grid columns={3}>

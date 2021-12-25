@@ -79,7 +79,13 @@ const Toolbar = () => {
   }, [formData, formError]);
 
   useEffect(() => {
-    if (!open) setFormData({ title: '', description: '' });
+    if (!open) {
+      setFormData({ title: '', description: '' });
+      setFormError({
+        title: false,
+        description: false
+      });
+    }
   }, [open]);
 
   return (

@@ -1,4 +1,15 @@
+import { findIndex } from 'lodash';
+
 const initialState = [];
+
+const updateTask = (task, state) => {
+  const index = findIndex(state, (t) => t.id.toString() === task.id.toString());
+
+  if (index === -1) return [...state];
+
+  state.splice(index, 1, { ...state[index], ...task });
+  return [...state];
+};
 
 const tasksReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -8,6 +19,8 @@ const tasksReducer = (state = initialState, action) => {
       return [...initialState];
     case 'ADD_TASK':
       return [...state, { ...action.payload }];
+    case 'UPDATE_TASK':
+      return updateTask(action.payload, state);
     default:
       return [...state];
   }

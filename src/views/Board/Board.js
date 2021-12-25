@@ -4,11 +4,19 @@ import { findIndex, has, isEmpty, map, reduce } from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { openSnack } from '../../redux/actions/snack';
-import { setTasks } from '../../redux/actions/task';
+import { removeAllTask, setTasks, updateTask } from '../../redux/actions/task';
 import Toolbar from './components/Toolbar';
-import { Card, Divider, Grid, Header, List, Segment } from 'semantic-ui-react';
+import {
+  Card,
+  Divider,
+  Grid,
+  Header,
+  List,
+  Segment,
+  Checkbox
+} from 'semantic-ui-react';
 
-const endpoint = `${process.env.REACT_APP_URL}/board`;
+const endpoint = `${process.env.REACT_APP_URL}`;
 
 const sections = [
   { title: 'Pending Tasks', id: 'pending' },
@@ -32,7 +40,7 @@ const Board = () => {
 
   const fetchBoardTasks = useCallback(async () => {
     try {
-      const response = await axios.get(`${endpoint}/${selectedId}`);
+      const response = await axios.get(`${endpoint}/board/${selectedId}`);
 
       if (response.status === 200) {
         const { data } = response.data;
@@ -44,6 +52,23 @@ const Board = () => {
     }
     // eslint-disable-next-line
   }, [selectedId]);
+
+  const toggleTaskComplete = async (task) => {
+    try {
+      const { isComplete, id } = task;
+      const data = { isComplete: !isComplete };
+      const response = await axios.put(`${endpoint}/task/${id}`, data);
+
+      if (response.status === 200) {
+        const { data } = response.data;
+        if (data && data[0]) dispatch(updateTask(data[0]));
+      }
+    } catch (err) {
+      console.error(err);
+      dispatch(openSnack('Facing error in updating task.'));
+    }
+    // eslint-disable-next-line
+  };
 
   useEffect(() => {
     const index = findIndex(
@@ -75,6 +100,13 @@ const Board = () => {
     setSeparatedTasks({ completed, pending });
   }, [tasks]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(removeAllTask());
+    };
+    // eslint-disable-next-line
+  }, []);
+
   if (notFound && !isEmpty(boards))
     return (
       <div>
@@ -104,6 +136,13 @@ const Board = () => {
                             <Card.Description>
                               {task.description}
                             </Card.Description>
+                          </Card.Content>
+                          <Card.Content floated="right">
+                            <Checkbox
+                              label="Completed"
+                              checked={task.isComplete}
+                              onChange={() => toggleTaskComplete({ ...task })}
+                            />
                           </Card.Content>
                         </Card>
                       </List.Content>
