@@ -6,6 +6,7 @@ import { Grid, Header, Button, Form } from 'semantic-ui-react';
 import { CustomModal } from '../../../components';
 import { addBoard } from '../../../redux/actions/board';
 import { openSnack } from '../../../redux/actions/snack';
+import { startLoading, stopLoading } from '../../../redux/actions/loader';
 
 const endpoint = `${process.env.REACT_APP_URL}/board`;
 
@@ -44,6 +45,9 @@ const Toolbar = () => {
 
   const createBoard = async () => {
     try {
+      // set loader
+      dispatch(startLoading('createBoard'));
+
       const data = { ...formData };
       const response = await axios.post(endpoint, data);
 
@@ -62,6 +66,7 @@ const Toolbar = () => {
       dispatch(openSnack('Facing error in creating board'));
     }
     handleClose();
+    dispatch(stopLoading('createBoard'));
   };
 
   useEffect(() => {
@@ -112,6 +117,7 @@ const Toolbar = () => {
         cancelButtonText="Cancel"
         successButtonText="Create"
         successButtonDisabled={submitDisable}
+        loaderId="createBoard"
       >
         <Form>
           <Form.Input

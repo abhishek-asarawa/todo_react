@@ -8,7 +8,7 @@ const LoaderCompo = ({ id, text, size = 'small' }) => {
 
   return (
     <Dimmer active={loaders[id]}>
-      <Loader size={size} inverted indeterminate>
+      <Loader size={size} indeterminate>
         {text ? text : 'Loading'}
       </Loader>
     </Dimmer>

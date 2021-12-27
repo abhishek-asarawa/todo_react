@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 
+import Loader from './Loader';
+
 function CustomModal({
   open,
   handleClose,
@@ -11,10 +13,12 @@ function CustomModal({
   successButtonDisabled,
   cancelButtonText,
   title,
-  children
+  children,
+  loaderId
 }) {
   return (
     <Modal closeIcon open={open} onClose={handleClose}>
+      {loaderId && <Loader id={loaderId} size="medium" />}
       <Header icon={icon ? icon : 'archive'} content={title} />
       <Modal.Content>{children}</Modal.Content>
       <Modal.Actions>
@@ -42,7 +46,8 @@ CustomModal.propTypes = {
   open: PropTypes.bool.isRequired,
   successButtonText: PropTypes.string,
   successButtonDisabled: PropTypes.bool,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+  loaderId: PropTypes.string
 };
 
 export default CustomModal;

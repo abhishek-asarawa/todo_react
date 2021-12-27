@@ -80,6 +80,7 @@ const TaskForm = ({
       cancelButtonText="Cancel"
       successButtonText={isUpdate ? 'Update' : 'Create'}
       successButtonDisabled={submitDisable}
+      loaderId={isUpdate ? 'updateTask' : 'createTask'}
     >
       <Form>
         <Form.Input

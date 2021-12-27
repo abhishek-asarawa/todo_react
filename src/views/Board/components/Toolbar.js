@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { Grid, Header, Button, Icon, Dropdown } from 'semantic-ui-react';
 import { AlertModal } from '../../../components';
 import { deleteBoard, updateBoard } from '../../../redux/actions/board';
+import { startLoading, stopLoading } from '../../../redux/actions/loader';
 import { openSnack } from '../../../redux/actions/snack';
 import { addTask } from '../../../redux/actions/task';
 import BoardForm from './BoardForm';
@@ -37,6 +38,9 @@ const Toolbar = ({ board }) => {
 
   const createTask = async (formData = {}) => {
     try {
+      // start loader
+      dispatch(startLoading('createTask'));
+
       const data = { ...formData, board: board.id };
       const response = await axios.post(`${endpoint}/task`, data);
 
@@ -48,11 +52,17 @@ const Toolbar = ({ board }) => {
       console.error(err);
       dispatch(openSnack('Facing error in creating task'));
     }
+
+    // stop loader
+    dispatch(stopLoading('createTask'));
     handleClose();
   };
 
   const handleUpdateBoard = async (boardData = {}) => {
     try {
+      // start loader
+      dispatch(startLoading('updateBoard'));
+
       const data = { ...boardData, board: board.id };
       const response = await axios.put(`${endpoint}/board/${board.id}`, data);
 
@@ -68,10 +78,15 @@ const Toolbar = ({ board }) => {
       console.error(err);
       dispatch(openSnack('Facing error in updating board'));
     }
+    // stop loader
+    dispatch(stopLoading('updateBoard'));
   };
 
   const handleDeleteBoard = async (boardData = {}) => {
     try {
+      // start loader
+      dispatch(startLoading('deleteBoard'));
+
       const response = await axios.delete(`${endpoint}/board/${board.id}`);
 
       if (response.status === 200) {
@@ -84,6 +99,8 @@ const Toolbar = ({ board }) => {
       console.error(err);
       dispatch(openSnack('Facing error in deleting board'));
     }
+    // stop loader
+    dispatch(stopLoading('deleteBoard'));
   };
 
   const goBack = () => {
@@ -155,6 +172,7 @@ const Toolbar = ({ board }) => {
         title={alertTitle}
         description={alertDesc}
         handleSubmit={() => handleDeleteBoard(board)}
+        loaderId={'deleteBoard'}
       />
     </Grid>
   );

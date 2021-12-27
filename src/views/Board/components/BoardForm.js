@@ -74,6 +74,7 @@ const BoardForm = ({ board, open, handleClose, handleSubmitData }) => {
       cancelButtonText="Cancel"
       successButtonText={'Update'}
       successButtonDisabled={submitDisable}
+      loaderId="updateBoard"
     >
       <Form>
         <Form.Input

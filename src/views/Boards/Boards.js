@@ -44,7 +44,7 @@ const Boards = () => {
     <div>
       <Toolbar />
       <div style={{ margin: '1%' }}>
-        <Loader id="boards" text="Loading boards" />
+        <Loader id="boards" text="Loading boards" size="massive" />
         <BoardTable
           columns={columns}
           rowWithClickEvent

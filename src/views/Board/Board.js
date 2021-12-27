@@ -24,6 +24,8 @@ import {
 } from 'semantic-ui-react';
 import timeConvertor from '../../helpers/timeConvertor';
 import TaskForm from './components/TaskForm';
+import { startLoading, stopLoading } from '../../redux/actions/loader';
+import { Loader } from '../../components';
 
 const endpoint = `${process.env.REACT_APP_URL}`;
 
@@ -60,6 +62,9 @@ const Board = () => {
 
   const fetchBoardTasks = useCallback(async () => {
     try {
+      // start loader
+      dispatch(startLoading('boardUI'));
+
       const response = await axios.get(`${endpoint}/board/${selectedId}`);
 
       if (response.status === 200) {
@@ -70,11 +75,16 @@ const Board = () => {
       console.error(err);
       dispatch(openSnack('Facing error in fetching board.'));
     }
+
+    // stop loader
+    dispatch(stopLoading('boardUI'));
     // eslint-disable-next-line
   }, [selectedId]);
 
   const toggleTaskComplete = async (task) => {
     try {
+      // start loader
+      dispatch(startLoading('boardUI'));
       const { isComplete, id } = task;
       const data = { isComplete: !isComplete };
       const response = await axios.put(`${endpoint}/task/${id}`, data);
@@ -87,10 +97,15 @@ const Board = () => {
       console.error(err);
       dispatch(openSnack('Facing error in updating task.'));
     }
+    // stop loader
+    dispatch(stopLoading('boardUI'));
   };
 
   const updateTaskData = async (task) => {
     try {
+      // start loader
+      dispatch(startLoading('updateTask'));
+
       const { title, description } = task;
       const { id } = selectedTask;
       const data = { title, description };
@@ -105,10 +120,14 @@ const Board = () => {
       console.error(err);
       dispatch(openSnack('Facing error in updating task.'));
     }
+    // stop loader
+    dispatch(stopLoading('updateTask'));
   };
 
   const handleDeleteTask = async (task) => {
     try {
+      // start loader
+      dispatch(startLoading('boardUI'));
       const { id } = task;
       if (!id) return dispatch(openSnack('Can not perform delete action'));
 
@@ -123,6 +142,8 @@ const Board = () => {
       console.error(err);
       dispatch(openSnack('Facing error in updating task.'));
     }
+    // stop loader
+    dispatch(stopLoading('boardUI'));
   };
 
   useEffect(() => {
@@ -171,6 +192,7 @@ const Board = () => {
 
   return (
     <div>
+      <Loader id="boardUI" size="massive" />
       <Toolbar board={selectedBoard} />
       <Segment padded style={{ minHeight: '650px' }}>
         <Grid columns={2} relaxed="very">
