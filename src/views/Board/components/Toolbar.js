@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Header, Button, Icon, Dropdown } from 'semantic-ui-react';
-import { updateBoard } from '../../../redux/actions/board';
+import { AlertModal } from '../../../components';
+import { deleteBoard, updateBoard } from '../../../redux/actions/board';
 import { openSnack } from '../../../redux/actions/snack';
 import { addTask } from '../../../redux/actions/task';
 import BoardForm from './BoardForm';
@@ -13,18 +14,26 @@ import TaskForm from './TaskForm';
 
 const endpoint = `${process.env.REACT_APP_URL}`;
 
+const alertTitle = 'Delete Board ?';
+const alertDesc =
+  'Deleting a board will delete all its tasks also. You can not undo it. Do you really want to delete board ?';
+
 const Toolbar = ({ board }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
   const [boardForm, setBoardForm] = useState(false);
+  const [alertModal, setAlertModal] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleOpenBoardForm = () => setBoardForm(true);
   const handleCloseBoardForm = () => setBoardForm(false);
+
+  const handleOpenAlert = () => setAlertModal(true);
+  const handleCloseAlert = () => setAlertModal(false);
 
   const createTask = async (formData = {}) => {
     try {
@@ -57,7 +66,23 @@ const Toolbar = ({ board }) => {
       handleCloseBoardForm();
     } catch (err) {
       console.error(err);
-      dispatch(openSnack('Facing error in creating task'));
+      dispatch(openSnack('Facing error in updating board'));
+    }
+  };
+
+  const handleDeleteBoard = async (boardData = {}) => {
+    try {
+      const response = await axios.delete(`${endpoint}/board/${board.id}`);
+
+      if (response.status === 200) {
+        handleCloseAlert();
+        goBack();
+        dispatch(deleteBoard(board));
+        dispatch(openSnack('Board deleted'));
+      }
+    } catch (err) {
+      console.error(err);
+      dispatch(openSnack('Facing error in deleting board'));
     }
   };
 
@@ -105,7 +130,9 @@ const Toolbar = ({ board }) => {
               <Dropdown.Item onClick={handleOpenBoardForm}>
                 Edit Board
               </Dropdown.Item>
-              <Dropdown.Item>Delete Board</Dropdown.Item>
+              <Dropdown.Item onClick={handleOpenAlert}>
+                Delete Board
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Grid.Column>
@@ -121,6 +148,13 @@ const Toolbar = ({ board }) => {
         open={boardForm}
         board={board}
         handleSubmitData={handleUpdateBoard}
+      />
+      <AlertModal
+        open={alertModal}
+        handleClose={handleCloseAlert}
+        title={alertTitle}
+        description={alertDesc}
+        handleSubmit={() => handleDeleteBoard(board)}
       />
     </Grid>
   );
