@@ -1,4 +1,4 @@
-import { findIndex, isEmpty } from 'lodash';
+import { filter, findIndex, isEmpty } from 'lodash';
 
 const initialState = [];
 
@@ -92,6 +92,22 @@ const deleteTask2Board = (task, boards) => {
   return [...boards];
 };
 
+const updateBoard = (board, state) => {
+  const index = findIndex(
+    state,
+    (b) => b.id.toString() === board.id.toString()
+  );
+
+  if (index === -1) return [...state];
+
+  state.splice(index, 1, { ...state[index], ...board });
+  return [...state];
+};
+
+const deleteBoard = (board, state) => {
+  return filter(state, (b) => b.id.toString() !== board.id.toString());
+};
+
 const boardsReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_BOARDS':
@@ -106,6 +122,10 @@ const boardsReducer = (state = initialState, action) => {
       return updateTask2Board(action.payload, state);
     case 'DELETE_TASK':
       return deleteTask2Board(action.payload, state);
+    case 'UPDATE_BOARD':
+      return updateBoard(action.payload, state);
+    case 'DELETE_BOARD':
+      return deleteBoard(action.payload, state);
     default:
       return [...state];
   }

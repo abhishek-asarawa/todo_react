@@ -4,26 +4,32 @@ import isObject from 'lodash/isObject';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Header, Button, Icon } from 'semantic-ui-react';
+import { Grid, Header, Button, Icon, Dropdown } from 'semantic-ui-react';
+import { updateBoard } from '../../../redux/actions/board';
 import { openSnack } from '../../../redux/actions/snack';
 import { addTask } from '../../../redux/actions/task';
+import BoardForm from './BoardForm';
 import TaskForm from './TaskForm';
 
-const endpoint = `${process.env.REACT_APP_URL}/task`;
+const endpoint = `${process.env.REACT_APP_URL}`;
 
 const Toolbar = ({ board }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
+  const [boardForm, setBoardForm] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleOpenBoardForm = () => setBoardForm(true);
+  const handleCloseBoardForm = () => setBoardForm(false);
+
   const createTask = async (formData = {}) => {
     try {
       const data = { ...formData, board: board.id };
-      const response = await axios.post(endpoint, data);
+      const response = await axios.post(`${endpoint}/task`, data);
 
       if (response.status === 200) {
         const { data } = response.data;
@@ -34,6 +40,25 @@ const Toolbar = ({ board }) => {
       dispatch(openSnack('Facing error in creating task'));
     }
     handleClose();
+  };
+
+  const handleUpdateBoard = async (boardData = {}) => {
+    try {
+      const data = { ...boardData, board: board.id };
+      const response = await axios.put(`${endpoint}/board/${board.id}`, data);
+
+      if (response.status === 200) {
+        const { data } = response.data;
+        if (data && data[0]) {
+          dispatch(updateBoard(data[0]));
+          dispatch(openSnack('Board updated'));
+        }
+      }
+      handleCloseBoardForm();
+    } catch (err) {
+      console.error(err);
+      dispatch(openSnack('Facing error in creating task'));
+    }
   };
 
   const goBack = () => {
@@ -67,12 +92,35 @@ const Toolbar = ({ board }) => {
             onClick={handleOpen}
           />
         </Grid.Column>
+        <Grid.Column width={2}>
+          <Dropdown
+            text="More"
+            icon="setting"
+            floating
+            labeled
+            button
+            className="icon"
+          >
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={handleOpenBoardForm}>
+                Edit Board
+              </Dropdown.Item>
+              <Dropdown.Item>Delete Board</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Grid.Column>
       </Grid.Row>
       <TaskForm
         handleClose={handleClose}
         open={open}
         task={{}}
         handleSubmitData={createTask}
+      />
+      <BoardForm
+        handleClose={handleCloseBoardForm}
+        open={boardForm}
+        board={board}
+        handleSubmitData={handleUpdateBoard}
       />
     </Grid>
   );
