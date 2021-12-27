@@ -4,7 +4,12 @@ import { findIndex, has, isEmpty, map, reduce } from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { openSnack } from '../../redux/actions/snack';
-import { removeAllTask, setTasks, updateTask } from '../../redux/actions/task';
+import {
+  deleteTask,
+  removeAllTask,
+  setTasks,
+  updateTask
+} from '../../redux/actions/task';
 import Toolbar from './components/Toolbar';
 import {
   Card,
@@ -13,8 +18,12 @@ import {
   Header,
   List,
   Segment,
-  Checkbox
+  Checkbox,
+  Icon,
+  Button
 } from 'semantic-ui-react';
+import timeConvertor from '../../helpers/timeConvertor';
+import TaskForm from './components/TaskForm';
 
 const endpoint = `${process.env.REACT_APP_URL}`;
 
@@ -35,6 +44,17 @@ const Board = () => {
     completed: [],
     pending: []
   });
+  const [open, setOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState({});
+
+  const handleOpen = (task) => {
+    setSelectedTask(task);
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setSelectedTask({});
+    setOpen(false);
+  };
 
   const selectedId = params.id;
 
@@ -67,7 +87,42 @@ const Board = () => {
       console.error(err);
       dispatch(openSnack('Facing error in updating task.'));
     }
-    // eslint-disable-next-line
+  };
+
+  const updateTaskData = async (task) => {
+    try {
+      const { title, description } = task;
+      const { id } = selectedTask;
+      const data = { title, description };
+      const response = await axios.put(`${endpoint}/task/${id}`, data);
+
+      if (response.status === 200) {
+        const { data } = response.data;
+        if (data && data[0]) dispatch(updateTask(data[0]));
+      }
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      dispatch(openSnack('Facing error in updating task.'));
+    }
+  };
+
+  const handleDeleteTask = async (task) => {
+    try {
+      const { id } = task;
+      if (!id) return dispatch(openSnack('Can not perform delete action'));
+
+      const response = await axios.delete(`${endpoint}/task/${id}`);
+
+      if (response.status === 200) {
+        dispatch(deleteTask({ ...task }));
+        dispatch(openSnack('Task deleted'));
+      }
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      dispatch(openSnack('Facing error in updating task.'));
+    }
   };
 
   useEffect(() => {
@@ -131,13 +186,31 @@ const Board = () => {
                       <List.Content>
                         <Card style={{ minWidth: '90%' }}>
                           <Card.Content>
+                            <Button
+                              icon
+                              floated="right"
+                              title="Delete"
+                              onClick={() => handleDeleteTask(task)}
+                            >
+                              <Icon color="red" name="delete" />
+                            </Button>
+                            <Button
+                              icon
+                              floated="right"
+                              title="Update"
+                              onClick={() => handleOpen(task)}
+                            >
+                              <Icon color="blue" name="pencil" />
+                            </Button>
                             <Card.Header>{task.title}</Card.Header>
-                            {/* <Card.Meta>Friends of Elliot</Card.Meta> */}
+                            <Card.Meta>{`Last change ${timeConvertor(
+                              task.updatedAt
+                            )}`}</Card.Meta>
                             <Card.Description>
                               {task.description}
                             </Card.Description>
                           </Card.Content>
-                          <Card.Content floated="right">
+                          <Card.Content>
                             <Checkbox
                               label="Completed"
                               checked={task.isComplete}
@@ -155,6 +228,13 @@ const Board = () => {
         </Grid>
         <Divider vertical fitted />
       </Segment>
+      <TaskForm
+        open={open}
+        handleClose={handleClose}
+        task={selectedTask}
+        handleSubmitData={updateTaskData}
+        isUpdate
+      />
     </div>
   );
 };

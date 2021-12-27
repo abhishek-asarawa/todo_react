@@ -1,4 +1,4 @@
-import { findIndex } from 'lodash';
+import { findIndex, isEmpty } from 'lodash';
 
 const initialState = [];
 
@@ -59,6 +59,39 @@ const updateTask2Board = (task, boards) => {
   return [...boards];
 };
 
+const deleteTask2Board = (task, boards) => {
+  const boardId = task.board;
+  const index = findIndex(
+    boards,
+    (board) => board.id.toString() === boardId.toString()
+  );
+
+  if (index === -1) return [...boards];
+
+  let board = boards[index];
+
+  let tasksAgg = board.tasksAgg;
+
+  if (isEmpty(tasksAgg)) return [...boards];
+
+  if (task.isComplete)
+    tasksAgg = {
+      ...tasksAgg,
+      total: tasksAgg.total > 0 ? tasksAgg.total - 1 : 0,
+      completed: tasksAgg.completed > 0 ? tasksAgg.completed - 1 : 0
+    };
+  else
+    tasksAgg = {
+      ...tasksAgg,
+      total: tasksAgg.total > 0 ? tasksAgg.total - 1 : 0,
+      pending: tasksAgg.pending > 0 ? tasksAgg.pending - 1 : 0
+    };
+
+  board = { ...board, tasksAgg };
+  boards.splice(index, 1, board);
+  return [...boards];
+};
+
 const boardsReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_BOARDS':
@@ -71,6 +104,8 @@ const boardsReducer = (state = initialState, action) => {
       return addTask2Board(action.payload, state);
     case 'UPDATE_TASK':
       return updateTask2Board(action.payload, state);
+    case 'DELETE_TASK':
+      return deleteTask2Board(action.payload, state);
     default:
       return [...state];
   }

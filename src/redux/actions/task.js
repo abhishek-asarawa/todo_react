@@ -13,6 +13,10 @@ export const updateTask = (task) => {
   return { type: 'UPDATE_TASK', payload: { ...task } };
 };
 
+export const deleteTask = (task) => {
+  return { type: 'DELETE_TASK', payload: { ...task } };
+};
+
 export const removeAllTask = () => {
   return { type: 'REMOVE_ALL_TASKS' };
 };

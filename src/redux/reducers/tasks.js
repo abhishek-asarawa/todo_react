@@ -1,4 +1,4 @@
-import { findIndex } from 'lodash';
+import { filter, findIndex } from 'lodash';
 
 const initialState = [];
 
@@ -11,6 +11,10 @@ const updateTask = (task, state) => {
   return [...state];
 };
 
+const deleteTask = (task, state) => {
+  return filter(state, (t) => t.id.toString() !== task.id.toString());
+};
+
 const tasksReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_TASKS':
@@ -21,6 +25,8 @@ const tasksReducer = (state = initialState, action) => {
       return [...state, { ...action.payload }];
     case 'UPDATE_TASK':
       return updateTask(action.payload, state);
+    case 'DELETE_TASK':
+      return deleteTask(action.payload, state);
     default:
       return [...state];
   }

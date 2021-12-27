@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { has } from 'lodash';
 import isObject from 'lodash/isObject';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Header, Button, Form, Icon } from 'semantic-ui-react';
-import { CustomModal } from '../../../components';
+import { Grid, Header, Button, Icon } from 'semantic-ui-react';
 import { openSnack } from '../../../redux/actions/snack';
 import { addTask } from '../../../redux/actions/task';
+import TaskForm from './TaskForm';
 
 const endpoint = `${process.env.REACT_APP_URL}/task`;
 
@@ -16,36 +16,11 @@ const Toolbar = ({ board }) => {
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({ title: '', description: '' });
-  const [formError, setFormError] = useState({
-    title: false,
-    description: false
-  });
-  const [submitDisable, setSubmitDisable] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleFormData = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const checkError = (name, value) => {
-    if (name === 'title') return value.length < 5 || value.length > 50;
-    if (name === 'description') return value.length < 10 || value.length > 120;
-    return false;
-  };
-
-  const handleFormError = (e) => {
-    const { name, value } = e.target;
-    setFormError((prev) => ({
-      ...prev,
-      [name]: checkError(name, value)
-    }));
-  };
-
-  const createTask = async () => {
+  const createTask = async (formData = {}) => {
     try {
       const data = { ...formData, board: board.id };
       const response = await axios.post(endpoint, data);
@@ -64,30 +39,6 @@ const Toolbar = ({ board }) => {
   const goBack = () => {
     navigate('/', { replace: true });
   };
-
-  useEffect(() => {
-    let haveError = Object.values(formError).some((value) => value);
-    if (!haveError) {
-      for (let key in formData) {
-        if (checkError(key, formData[key])) {
-          haveError = true;
-          break;
-        }
-      }
-    }
-    if (haveError) setSubmitDisable(true);
-    else setSubmitDisable(false);
-  }, [formData, formError]);
-
-  useEffect(() => {
-    if (!open) {
-      setFormData({ title: '', description: '' });
-      setFormError({
-        title: false,
-        description: false
-      });
-    }
-  }, [open]);
 
   return (
     <Grid columns={3}>
@@ -117,55 +68,12 @@ const Toolbar = ({ board }) => {
           />
         </Grid.Column>
       </Grid.Row>
-      <CustomModal
+      <TaskForm
         handleClose={handleClose}
-        handleSubmit={createTask}
-        icon="flipboard"
         open={open}
-        title="Create Task"
-        cancelButtonText="Cancel"
-        successButtonText="Create"
-        successButtonDisabled={submitDisable}
-      >
-        <Form>
-          <Form.Input
-            error={
-              formError.title
-                ? {
-                    content: 'Title must be between then 5-50 char long',
-                    pointing: 'above'
-                  }
-                : false
-            }
-            fluid
-            label="Title"
-            placeholder="Task title"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleFormData}
-            onBlur={handleFormError}
-          />
-          <Form.Input
-            error={
-              formError.description
-                ? {
-                    content: 'Description must be between 10-120 char long.',
-                    pointing: 'above'
-                  }
-                : false
-            }
-            fluid
-            label="Description"
-            placeholder="Task description"
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleFormData}
-            onBlur={handleFormError}
-          />
-        </Form>
-      </CustomModal>
+        task={{}}
+        handleSubmitData={createTask}
+      />
     </Grid>
   );
 };
