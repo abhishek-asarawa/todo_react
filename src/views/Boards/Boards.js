@@ -42,12 +42,14 @@ const Boards = () => {
   return (
     <div>
       <Toolbar />
-      <BoardTable
-        columns={columns}
-        rowWithClickEvent
-        handleClick={handleRedirect}
-        rows={boards}
-      />
+      <div style={{ margin: '1%' }}>
+        <BoardTable
+          columns={columns}
+          rowWithClickEvent
+          handleClick={handleRedirect}
+          rows={boards}
+        />
+      </div>
     </div>
   );
 };

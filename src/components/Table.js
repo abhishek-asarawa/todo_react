@@ -2,12 +2,27 @@ import React from 'react';
 import map from 'lodash/map';
 import { Table } from 'semantic-ui-react';
 import timeConvertor from '../helpers/timeConvertor';
+import timeDiffToStr from '../helpers/timeDifference';
 
 const getNestedValue = (obj, path) => {
   const [first, ...rest] = path.split('.');
   const data = obj[first];
   if (rest.length === 0) return data;
   return getNestedValue(data, rest.join('.'));
+};
+
+const getCellValue = (row, cell) => {
+  const value = getNestedValue(row, cell.id);
+  switch (cell.type) {
+    case 'timestamp':
+      return timeConvertor(value);
+
+    case 'timeDiff':
+      return timeDiffToStr(value);
+
+    default:
+      return value;
+  }
 };
 
 const BoardTable = ({ columns, rows, rowWithClickEvent, handleClick }) => {
@@ -27,7 +42,12 @@ const BoardTable = ({ columns, rows, rowWithClickEvent, handleClick }) => {
                 </Table.HeaderCell>
               ))}
               {index === 0 && (
-                <Table.HeaderCell key="tasks" colSpan="3" textAlign="center">
+                <Table.HeaderCell
+                  key="tasks"
+                  colSpan="3"
+                  textAlign="center"
+                  width={8}
+                >
                   Tasks
                 </Table.HeaderCell>
               )}
@@ -50,9 +70,7 @@ const BoardTable = ({ columns, rows, rowWithClickEvent, handleClick }) => {
                     key={`${col_index}_${index}`}
                     textAlign={cell.textAlign ? cell.textAlign : 'left'}
                   >
-                    {cell.type === 'timestamp'
-                      ? timeConvertor(getNestedValue(row, cell.id))
-                      : getNestedValue(row, cell.id)}
+                    {getCellValue(row, cell)}
                   </Table.Cell>
                 );
               })}
