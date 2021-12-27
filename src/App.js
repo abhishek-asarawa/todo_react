@@ -10,6 +10,7 @@ import Navigation from './Navigation';
 import { closeSnack, openSnack } from './redux/actions/snack';
 import axios from 'axios';
 import { setBoards } from './redux/actions/board';
+import { startLoading, stopLoading } from './redux/actions/loader';
 
 const endpoint = `${process.env.REACT_APP_URL}/boards?task-aggregates=required`;
 
@@ -33,6 +34,9 @@ function App() {
 
   const fetchBoards = useCallback(async () => {
     try {
+      // setting loading
+      dispatch(startLoading('boards'));
+
       const response = await axios.get(endpoint);
 
       if (response.status === 200) {
@@ -44,6 +48,8 @@ function App() {
       console.error(err);
       dispatch(openSnack('Facing error in getting boards.'));
     }
+    // stop loading
+    dispatch(stopLoading('boards'));
     //eslint-disable-next-line
   }, []);
 

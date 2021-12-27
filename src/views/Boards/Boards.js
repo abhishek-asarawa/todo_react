@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import BoardTable from '../../components/Table';
 import Toolbar from './components/Toolbar';
+import { Loader } from '../../components';
 
 const columns = [
   [
@@ -43,6 +44,7 @@ const Boards = () => {
     <div>
       <Toolbar />
       <div style={{ margin: '1%' }}>
+        <Loader id="boards" text="Loading boards" />
         <BoardTable
           columns={columns}
           rowWithClickEvent

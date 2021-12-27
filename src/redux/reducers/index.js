@@ -4,8 +4,9 @@ import { combineReducers } from 'redux';
 import boardsReducer from './boards';
 import snackReducer from './snack';
 import tasksReducer from './tasks';
+import loaderReducer from './loaders';
 
-const reducers = { boardsReducer, snackReducer, tasksReducer };
+const reducers = { boardsReducer, snackReducer, tasksReducer, loaderReducer };
 
 const rootReducer = combineReducers(reducers);
 
